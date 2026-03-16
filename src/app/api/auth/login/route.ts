@@ -26,7 +26,8 @@ export async function POST(request: Request) {
     role: user.role
   });
 
-  cookies().set("crm_token", token, cookieOptions());
+  const cookieStore = await cookies();
+  cookieStore.set("crm_token", token, cookieOptions());
 
   return NextResponse.json({
     user: {
