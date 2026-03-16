@@ -7,6 +7,7 @@ export interface SessionPayload {
   role: Role;
   name: string;
   email: string;
+  [key: string]: string;
 }
 
 const secret = new TextEncoder().encode(
@@ -14,7 +15,7 @@ const secret = new TextEncoder().encode(
 );
 
 export async function signSession(payload: SessionPayload, expiresIn = "8h") {
-  return new SignJWT(payload)
+  return new SignJWT(payload as Record<string, string>)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(expiresIn)
@@ -24,7 +25,7 @@ export async function signSession(payload: SessionPayload, expiresIn = "8h") {
 export async function verifySession(token: string) {
   try {
     const { payload } = await jwtVerify(token, secret);
-    return payload as SessionPayload;
+    return payload as unknown as SessionPayload;
   } catch {
     return null;
   }
