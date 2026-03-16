@@ -7,12 +7,13 @@ import { patientCreateSchema } from "@/lib/validators";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { session, response } = await requireSession(request);
   if (!session) return response!;
 
-  const record = patients.find((patient) => patient.id === params.id);
+  const { id } = await params;
+  const record = patients.find((patient) => patient.id === id);
   if (!record) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
@@ -21,7 +22,7 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { session, response } = await requireSession(request);
   if (!session) return response!;
@@ -37,7 +38,8 @@ export async function PATCH(
     return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
   }
 
-  const recordIndex = patients.findIndex((patient) => patient.id === params.id);
+  const { id } = await params;
+  const recordIndex = patients.findIndex((patient) => patient.id === id);
   if (recordIndex === -1) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
